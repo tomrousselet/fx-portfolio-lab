@@ -13,7 +13,7 @@ The methodology, every design choice and its justification are documented in the
 | Phase | Content | Status |
 |---|---|---|
 | 0 | Setup: repository, environment, tests, paper skeleton | done |
-| 1 | Engine: data (done), currency excess returns, backtester with transaction costs | in progress |
+| 1 | Engine: data and currency excess returns (done), backtester with transaction costs | in progress |
 | 2 | Currency portfolios: carry, momentum, value; GMV / MV / risk parity | planned |
 | 3 | Optimal currency hedging for a EUR investor | planned |
 | 4 | FX structuring: Garman-Kohlhagen, smile, structured hedging products | planned |
@@ -24,7 +24,7 @@ The methodology, every design choice and its justification are documented in the
 ```
 src/fxlab/      Python package (the library)
 tests/          automated tests (pytest)
-scripts/        command-line scripts (data download)
+scripts/        command-line scripts (data download, tables for the paper)
 notebooks/      exploratory notebooks that use the library
 data/raw/       downloaded data (not versioned)
 paper/          working paper (LaTeX)

@@ -38,11 +38,29 @@ Entries are never deleted: a decision that is reversed is superseded by a new en
 {(a) Manual download from the website. (b) The FRED API, which requires a personal key. (c) A third-party package such as \texttt{pandas-datareader}.}
 {A script makes the dataset reproducible with one command and can refresh it at any time. The public CSV interface needs no key and only the Python standard library, so there is no dependency that could break. A single quotation convention avoids sign errors on half of the currencies.}
 
+\decision{D8}{19 October 2026}{Monthly frequency, month-end sampling}
+{Currency strategies are formed and evaluated monthly, using the last available spot rate of each month.}
+{(a) Daily frequency. (b) Weekly frequency. (c) Monthly averages of spot rates.}
+{Interest rates are only available monthly, so a higher frequency would reuse the same rate for a whole month. Monthly rebalancing is the standard of the currency literature \citep{lustig2011,menkhoff2012carry}, which makes the results comparable, and it keeps turnover and transaction costs low. Month-end rates, not averages, are used because a position is opened and closed at a given rate, not at an average.}
+
+\decision{D9}{19 October 2026}{Unbalanced panel from January 1999}
+{The sample starts in January 1999; each currency enters as soon as its spot rate and interest rate are both available. A balanced panel (2002--2026) is used as a robustness check.}
+{(a) Balanced panel from May 2002 only. (b) Start in the 1980s without the euro.}
+{Starting with the euro gives a homogeneous G10 universe. An unbalanced panel uses three more years of data without inventing any, as in \citet{lustig2011}; the robustness check verifies that the conclusions do not depend on this choice.}
+
+\decision{D10}{19 October 2026}{US dollar as base currency for the currency portfolios}
+{The excess returns of Phase 2 are measured from the point of view of a US investor; the euro-based investor is the subject of Phase 3.}
+{Euro as base currency from the start.}
+{The data are quoted against the US dollar and almost all of the literature uses a US investor, so the results can be compared with published ones. Excess returns of long-short portfolios do not depend much on the base currency, since the base currency cancels out of a long-short position.}
+
+\decision{D11}{19 October 2026}{Excess return defined as the simple return of a one-month forward}
+{$rx_{t+1} = S_{t+1}/F_t - 1$ with $F_t$ implied by CIP and the monthly rate equal to the annual rate divided by 12 (equations~\ref{eq:fwd-monthly}--\ref{eq:rx-monthly}).}
+{(a) Log excess return $\ln S_{t+1} - \ln F_t$, common in the literature. (b) Deposit version \eqref{eq:rx-deposit}.}
+{The portfolio formula $r_p = \w'\vect{r}$ of the course holds for simple returns, not for log returns, so simple returns can be aggregated across currencies without approximation. The forward is the instrument actually traded by an FX desk for this exposure, and it requires no capital beyond margin. The deposit version differs only by the factor $1+i_t$ (equation~\ref{eq:rx-forward}).}
+
 \subsection*{Open decisions}
 \addcontentsline{toc}{subsection}{Open decisions}
 \begin{itemize}
-  \item Base currency of the currency portfolios (USD, as in most of the literature, or EUR).
-  \item Data frequency (monthly for strategies, daily for risk measures?).
-  \item Exact definition of the excess return: deposit version \eqref{eq:rx-deposit} or forward version \eqref{eq:rx-forward}.
-  \item Transaction cost model.
+  \item Transaction cost model (bid--ask spreads on spot and forwards).
+  \item Extension of the euro and sterling interest rates after January 2026 (ECB and Bank of England series).
 \end{itemize}

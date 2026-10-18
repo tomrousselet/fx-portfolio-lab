@@ -2,12 +2,14 @@
 
 \begin{table}[h]
 \centering
+\small
 \begin{tabular}{@{}ll@{}}
 \toprule
 Module & Content \\
 \midrule
 \texttt{fxlab.portfolio} & Returns, compounding, valuation of buy-and-hold and rebalanced portfolios \\
 \texttt{fxlab.data} & Download and loading of FRED series, quotation convention \\
+\texttt{fxlab.fx\_returns} & Month-end sampling, CIP forwards, excess returns, carry \\
 \bottomrule
 \end{tabular}
 \caption{Modules of the \texttt{fxlab} package.}
@@ -15,6 +17,7 @@ Module & Content \\
 
 \begin{table}[h]
 \centering
+\small
 \begin{tabular}{@{}lll@{}}
 \toprule
 Test & Source & Result checked \\
@@ -28,6 +31,14 @@ Test & Source & Result checked \\
 \texttt{test\_spot\_converted\_\ldots} & FRED conventions & JPY per USD inverted \\
 \texttt{test\_missing\_values\_\ldots} & FRED format & missing values are NaN \\
 \texttt{test\_rates\_in\_decimal} & FRED format & 5\% read as 0.05 \\
+\texttt{test\_forward\_by\_cip} & Eq.~\eqref{eq:fwd-monthly} & forward computed by hand \\
+\texttt{test\_excess\_return\_by\_hand} & Eq.~\eqref{eq:rx-monthly} & excess return computed by hand \\
+\texttt{test\_equal\_rates\_\ldots} & Eq.~\eqref{eq:rx-monthly} & no carry: $rx$ = spot return \\
+\texttt{test\_carry\_\ldots} & Section~\ref{sec:rx} & carry $\approx (i^*-i)/12$ \\
+\texttt{test\_no\_look\_ahead} & Timing rule & $rx_{t+1}$ unaffected by later data \\
+\texttt{test\_month\_end\_spot\_\ldots} & Sampling rule & last available day used \\
+\texttt{test\_incomplete\_last\_month\_\ldots} & Sampling rule & partial month dropped \\
+\texttt{test\_rates\_dated\_\ldots} & Timing rule & rate dated at month end \\
 \bottomrule
 \end{tabular}
 \caption{Verification tests.}
