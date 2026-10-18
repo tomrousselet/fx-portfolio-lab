@@ -1,0 +1,49 @@
+\section{Framework and notation}\label{sec:framework}
+
+\subsection{Portfolio valuation}
+
+A portfolio invested in $N$ constituents holds an amount $\theta_{t,i}$ in constituent $i$ at date $t$.
+Its value and weights are
+\begin{equation}
+  V_t = \sum_{i=1}^N \theta_{t,i}, \qquad w_{t,i} = \frac{\theta_{t,i}}{V_t}.
+\end{equation}
+Between two rebalancing dates the portfolio is buy-and-hold: the number of units of each constituent is constant, so each amount grows with the constituent's own return,
+\begin{equation}\label{eq:amount-update}
+  \theta_{[t+1]^-,i} = \theta_{t,i}\,(1 + r_{t,t+1,i}),
+\end{equation}
+and the portfolio return is the average of the constituents' returns weighted by the \emph{initial} weights,
+\begin{equation}\label{eq:fundamental}
+  r_{t,t+1,p} = \sum_{i=1}^N w_{t,i}\, r_{t,t+1,i} = \w_t' \vect{r}_{t,t+1}.
+\end{equation}
+On a rebalancing date the amounts are reset by the allocation rule; for a fixed-mix rule with target weights $w_i$, $\theta_{t+1,i} = w_i V_{t+1}$.
+The amount traded, $\sum_i |\theta_{t+1,i} - \theta_{[t+1]^-,i}|$, determines the transaction costs.
+
+\subsection{Moments and optimal portfolios}
+
+With $\muv$ the vector of expected returns and $\Sig$ the covariance matrix of the constituents,
+\begin{equation}
+  \mu_p = \w'\muv, \qquad \sigma_p^2 = \w'\Sig\w.
+\end{equation}
+The global minimum variance (GMV) portfolio and the maximum return-to-risk (MRR) portfolio are
+\begin{equation}
+  \w_{\mathrm{gmv}} = \frac{\Sig^{-1}\one}{\one'\Sig^{-1}\one}, \qquad
+  \w_{\mathrm{mrr}} = \frac{\Sig^{-1}\muv}{\one'\Sig^{-1}\muv},
+\end{equation}
+and, by the two-fund separation theorem, every efficient portfolio is a combination of the two \citep{milhau2026}.
+
+\subsection{Currency excess returns}
+
+Let $S_t$ be the spot exchange rate, in US dollars per unit of foreign currency, and $i_t$, $i_t^*$ the domestic (USD) and foreign interest rates over $(t,t+1)$.
+A US investor who borrows one dollar at $i_t$ and invests it in a foreign deposit earns the excess return
+\begin{equation}\label{eq:rx-deposit}
+  rx_{t+1} = (1 + i_t^*)\frac{S_{t+1}}{S_t} - (1 + i_t)
+  \approx \underbrace{(i_t^* - i_t)}_{\text{carry}} + \underbrace{\frac{S_{t+1} - S_t}{S_t}}_{\text{spot change}}.
+\end{equation}
+The same exposure is obtained with a forward contract.
+Under covered interest parity (CIP) the forward rate is $F_t = S_t (1 + i_t)/(1 + i_t^*)$, and a long forward position on $1/F_t$ units of foreign currency yields
+\begin{equation}\label{eq:rx-forward}
+  \frac{S_{t+1} - F_t}{F_t} = \frac{rx_{t+1}}{1 + i_t}.
+\end{equation}
+The approximation in \eqref{eq:rx-deposit} shows the economic content of a currency position: the investor earns the interest rate differential and bears the risk of a depreciation of the foreign currency.
+Uncovered interest parity predicts that the two terms offset on average; the empirical failure of this prediction is the source of the carry trade premium \citep{lustig2011}.
+Since 2008, CIP no longer holds exactly \citep{du2018}; the consequences for our data are discussed in Section~\ref{sec:data}.

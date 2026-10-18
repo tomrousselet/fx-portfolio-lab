@@ -1,0 +1,21 @@
+% Notation shared by all sections (follows the portfolio construction course)
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\w}{\vect{w}}
+\newcommand{\muv}{\vect{\mu}}
+\newcommand{\one}{\vect{1}}
+\newcommand{\Sig}{\boldsymbol{\Sigma}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+% Decision log entry: \decision{ID}{date}{title}{decision}{alternatives}{rationale}
+\newcommand{\decision}[6]{%
+  \subsection*{#1 -- #3}
+  \addcontentsline{toc}{subsection}{#1 -- #3}
+  \begin{description}
+    \item[Date] #2
+    \item[Decision] #4
+    \item[Alternatives] #5
+    \item[Rationale] #6
+  \end{description}}

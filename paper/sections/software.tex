@@ -1,0 +1,30 @@
+\section{Software architecture and verification}\label{app:software}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+Module & Content \\
+\midrule
+\texttt{fxlab.portfolio} & Returns, compounding, valuation of buy-and-hold and rebalanced portfolios \\
+\bottomrule
+\end{tabular}
+\caption{Modules of the \texttt{fxlab} package.}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+Test & Source & Result checked \\
+\midrule
+\texttt{test\_table1\_buy\_and\_hold} & Course, Table 1 & $V_1 = \$978.21$, return $-2.18\%$ \\
+\texttt{test\_table1\_rebalancing\_\ldots} & Course, section 1.4 & \$6.37 traded \\
+\texttt{test\_midterm\_q1\_amount\_update} & Midterm 2024--25, Q1 & \$36.29 \\
+\texttt{test\_midterm\_q4\_weight\_drift} & Midterm 2024--25, Q4 & weight 74.9\% \\
+\texttt{test\_midterm\_q7\_compounding} & Midterm 2024--25, Q7 & $+0.8\%$ \\
+\texttt{test\_single\_rebalance\_\ldots} & Course, section 1.8 & equals buy-and-hold \\
+\bottomrule
+\end{tabular}
+\caption{Verification tests.}
+\end{table}

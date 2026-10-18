@@ -1,0 +1,52 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[round,authoryear]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\input{macros}
+
+\title{FX Portfolio Lab:\\From Portfolio Construction to FX Structuring}
+\author{Tom Rousselet\\EDHEC Business School}
+\date{Working paper -- draft of \today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This working paper documents a research project that studies the foreign exchange (FX) market from three angles: the portfolio manager who allocates across currencies, the investor who hedges the currency risk of foreign assets, and the structurer who designs hedging products for corporate clients.
+We first build a valuation and backtesting engine whose correctness is verified against analytical results.
+We then construct G10 currency portfolios from carry, momentum and value signals and combine them with minimum-variance, mean-variance and risk-parity allocations, paying particular attention to estimation error and transaction costs.
+Next, we derive the optimal hedge ratio of a euro-based investor.
+Finally, we price and compare the structured products used to hedge FX exposures.
+Every design decision is recorded together with the alternatives considered and the reason for the choice (Appendix~\ref{app:decisions}).
+\end{abstract}
+
+\tableofcontents
+\bigskip
+
+\input{sections/introduction}
+\input{sections/framework}
+\input{sections/data}
+\input{sections/engine}
+\input{sections/currency_portfolios}
+\input{sections/hedging}
+\input{sections/structuring}
+\input{sections/conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\input{sections/decisions}
+\input{sections/software}
+
+\end{document}

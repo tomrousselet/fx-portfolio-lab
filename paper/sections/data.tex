@@ -1,0 +1,12 @@
+\section{Data}\label{sec:data}
+
+\todo{Phase 1. Planned sources, to be confirmed once downloaded and inspected.}
+
+\begin{itemize}
+  \item \textbf{Spot exchange rates}: daily noon buying rates in New York for the G10 currencies, Federal Reserve H.10 release, through FRED.
+  \item \textbf{Interest rates}: short-term interbank rates (3-month) from the OECD Main Economic Indicators, through FRED; euro short-term rate (\texttt{ESTR}) from the ECB.
+  \item \textbf{Forward rates}: not freely available; implied from spot and interest rates by CIP (equation~\ref{eq:rx-forward}). Limitation: post-2008 CIP deviations \citep{du2018}.
+  \item \textbf{Transaction costs}: bid--ask spreads taken from the literature for G10 currencies \todo{reference and figures}.
+\end{itemize}
+
+Planned summary table: sample period, frequency, number of observations, missing values and their treatment for each series.

@@ -1,0 +1,43 @@
+\section{Decision log}\label{app:decisions}
+
+Each entry records a choice that could affect the results or the usability of the project, the alternatives that were considered and the reason for the choice.
+Entries are never deleted: a decision that is reversed is superseded by a new entry that refers to it.
+
+\decision{D1}{18 October 2026}{Language of the project}
+{The paper, the code and its comments are written in English.}
+{French.}
+{English is the working language of trading floors and of open-source code, and the project is meant to be shown to recruiters, including outside France.}
+
+\decision{D2}{18 October 2026}{Code organised as an installable Python package}
+{The code lives in a package (\texttt{src/fxlab}) installed in a virtual environment; notebooks only import and use it.}
+{(a) Code written directly in Jupyter notebooks. (b) Loose scripts.}
+{Code in notebooks cannot be tested or reused, and is easily run out of order. A package separates the library (tested, reused by every phase) from the analysis (notebooks). The \texttt{src} layout guarantees that the tests run against the installed package, not against stray files.}
+
+\decision{D3}{18 October 2026}{Course examples used as automated tests}
+{Every worked example of the course that the code can reproduce is encoded as a test (\texttt{pytest}), with a tolerance that reflects the rounding of the published inputs.}
+{Checking results by eye in notebooks.}
+{The course examples have known answers, so they are an independent specification of what the code must do. Automated tests are rerun after every change, which prevents an improvement in one place from silently breaking another.}
+
+\decision{D4}{18 October 2026}{Valuation by propagation of amounts}
+{Portfolios are valued by propagating the amount held in each constituent and resetting it on rebalancing dates (course, section~1.8).}
+{Compounding the portfolio return $\w'\vect{r}$ with fixed weights.}
+{Compounding with fixed weights is only valid when the portfolio is rebalanced at every date. Propagating amounts handles any rebalancing frequency and gives the amount traded, which is needed for transaction costs.}
+
+\decision{D5}{18 October 2026}{Free, official data sources}
+{Exchange rates and interest rates are taken from official publishers (Federal Reserve, OECD, ECB) through FRED and the ECB data portal; forward rates are implied by CIP.}
+{(a) Bloomberg or Refinitiv: no access. (b) Yahoo Finance: unofficial interface, no documentation of the series, known data errors.}
+{Official sources are documented, stable and allow anyone to reproduce the results. The cost is that forward rates are not observed; this is acknowledged as a limitation (Section~\ref{sec:data}).}
+
+\decision{D6}{18 October 2026}{Working paper in \LaTeX{}, versioned with the code}
+{The documentation is a \LaTeX{} article stored in the same repository as the code.}
+{(a) A word processor document. (b) Notebooks only.}
+{\LaTeX{} is the standard for scientific documents with equations. Keeping it in the repository ties each version of the text to the version of the code that produced its results.}
+
+\subsection*{Open decisions}
+\addcontentsline{toc}{subsection}{Open decisions}
+\begin{itemize}
+  \item Base currency of the currency portfolios (USD, as in most of the literature, or EUR).
+  \item Data frequency (monthly for strategies, daily for risk measures?).
+  \item Exact definition of the excess return: deposit version \eqref{eq:rx-deposit} or forward version \eqref{eq:rx-forward}.
+  \item Transaction cost model.
+\end{itemize}

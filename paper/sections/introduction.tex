@@ -1,0 +1,23 @@
+\section{Introduction}\label{sec:intro}
+
+The FX market is the largest financial market in the world, with an average daily turnover of about 7.5 trillion US dollars in April 2022 \citep{bis2022}.
+Banks intervene in it in three main roles: they take and manage risk on behalf of investors, they help clients hedge their exposures, and they design structured solutions for corporate treasurers.
+This project reproduces, at a small scale and with public data, the analytical work behind each of these roles.
+
+The project is organised around four research questions.
+
+\begin{enumerate}
+  \item \textbf{Engine.} How can a currency portfolio be valued correctly, including forward positions, rebalancing and transaction costs? (Section~\ref{sec:engine})
+  \item \textbf{Currency portfolios.} Do the carry, momentum and value strategies documented in the literature \citep{lustig2011,menkhoff2012carry,menkhoff2012momentum,asness2013} survive realistic transaction costs, and which allocation method combines them best out of sample? (Section~\ref{sec:portfolios})
+  \item \textbf{Hedging.} Which fraction of the currency exposure of foreign equities and bonds should a euro-based investor hedge to minimise risk? \citep{campbell2010} (Section~\ref{sec:hedging})
+  \item \textbf{Structuring.} How do forwards, options and structured products (collars, participating forwards, target redemption forwards) compare for a corporate hedger, in terms of cost and distribution of outcomes? (Section~\ref{sec:structuring})
+\end{enumerate}
+
+The analytical framework of the first two questions is that of portfolio construction theory: valuation of rebalanced portfolios, first two moments of a portfolio return, minimum-variance and mean-variance optimisation \citep{markowitz1952,milhau2026}.
+A recurring theme is that the inputs of these optimisations are estimated, and that naive mean-variance portfolios are dominated out of sample by simple rules \citep{demiguel2009}.
+
+\paragraph{Methodological principles.}
+Three principles are applied throughout.
+(i) \emph{No look-ahead bias}: every quantity used to form a portfolio at date $t$ is computed from data available at $t$.
+(ii) \emph{Verification}: every piece of code is checked against an analytical result or a published number before it is used (Appendix~\ref{app:software}).
+(iii) \emph{Traceability}: every choice that could change the results is recorded in the decision log (Appendix~\ref{app:decisions}).

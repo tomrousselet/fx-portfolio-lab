@@ -1,0 +1,12 @@
+\section{Valuation and backtesting engine}\label{sec:engine}
+
+The engine values a portfolio by propagating the dollar amounts held in each constituent, following the general method of \citet{milhau2026}: amounts are updated with equation~\eqref{eq:amount-update} between rebalancing dates and reset by the allocation rule on rebalancing dates.
+Working with amounts rather than weights has two advantages.
+First, it handles any rebalancing frequency with the same code (daily rebalancing and buy-and-hold are the two limiting cases).
+Second, it gives the amount traded at each date directly, from which transaction costs are computed (Decision~D4).
+
+\paragraph{Verification.}
+The engine reproduces the worked examples of the course: the valuation of an equally weighted portfolio of five US stocks between 2 and 5 January 2015 (final value \$978.21, \$6.37 traded to return to equal weights), the drift of weights in a buy-and-hold portfolio, and the compounding of returns.
+These examples are encoded as automated tests (Appendix~\ref{app:software}).
+
+\todo{Phase 1: forward positions, transaction costs, performance and risk measures.}
