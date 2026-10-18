@@ -58,6 +58,11 @@ Entries are never deleted: a decision that is reversed is superseded by a new en
 {(a) Log excess return $\ln S_{t+1} - \ln F_t$, common in the literature. (b) Deposit version \eqref{eq:rx-deposit}.}
 {The portfolio formula $r_p = \w'\vect{r}$ of the course holds for simple returns, not for log returns, so simple returns can be aggregated across currencies without approximation. The forward is the instrument actually traded by an FX desk for this exposure, and it requires no capital beyond margin. The deposit version differs only by the factor $1+i_t$ (equation~\ref{eq:rx-forward}).}
 
+\decision{D12}{19 October 2026}{Continuous integration and MIT licence}
+{The test suite runs automatically on GitHub Actions at every push, on Python 3.11 and 3.13; the code is published under the MIT licence.}
+{(a) Running the tests locally only. (b) No licence, or a restrictive one.}
+{Tests run on a clean machine catch errors that a local environment hides (a missing dependency, a file that only exists locally), and the badge shows any reader that the suite passes. Without a licence, published code cannot legally be reused; MIT is the most common licence for demonstration projects and imposes only attribution.}
+
 \subsection*{Open decisions}
 \addcontentsline{toc}{subsection}{Open decisions}
 \begin{itemize}
