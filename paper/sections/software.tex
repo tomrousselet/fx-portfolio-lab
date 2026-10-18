@@ -7,6 +7,7 @@
 Module & Content \\
 \midrule
 \texttt{fxlab.portfolio} & Returns, compounding, valuation of buy-and-hold and rebalanced portfolios \\
+\texttt{fxlab.data} & Download and loading of FRED series, quotation convention \\
 \bottomrule
 \end{tabular}
 \caption{Modules of the \texttt{fxlab} package.}
@@ -24,6 +25,9 @@ Test & Source & Result checked \\
 \texttt{test\_midterm\_q4\_weight\_drift} & Midterm 2024--25, Q4 & weight 74.9\% \\
 \texttt{test\_midterm\_q7\_compounding} & Midterm 2024--25, Q7 & $+0.8\%$ \\
 \texttt{test\_single\_rebalance\_\ldots} & Course, section 1.8 & equals buy-and-hold \\
+\texttt{test\_spot\_converted\_\ldots} & FRED conventions & JPY per USD inverted \\
+\texttt{test\_missing\_values\_\ldots} & FRED format & missing values are NaN \\
+\texttt{test\_rates\_in\_decimal} & FRED format & 5\% read as 0.05 \\
 \bottomrule
 \end{tabular}
 \caption{Verification tests.}

@@ -1,12 +1,42 @@
 \section{Data}\label{sec:data}
 
-\todo{Phase 1. Planned sources, to be confirmed once downloaded and inspected.}
+All series are downloaded from FRED, the database of the Federal Reserve Bank of St.~Louis, by the script \texttt{scripts/download\_data.py} (Decision~D7).
+Table~\ref{tab:data} lists them.
 
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Currency & Spot series & Spot available & Rate series & Rate available \\
+\midrule
+USD & -- & -- & \texttt{IR3TIB01USM156N} & 1964-06 -- 2026-09 \\
+EUR & \texttt{DEXUSEU} & 1999-01 -- 2026-10 & \texttt{IR3TIB01EZM156N} & 1994-01 -- 2026-01 \\
+GBP & \texttt{DEXUSUK} & 1971-01 -- 2026-10 & \texttt{IR3TIB01GBM156N} & 1957-01 -- 2026-01 \\
+AUD & \texttt{DEXUSAL} & 1971-01 -- 2026-10 & \texttt{IR3TIB01AUM156N} & 1968-01 -- 2026-08 \\
+NZD & \texttt{DEXUSNZ} & 1971-01 -- 2026-10 & \texttt{IR3TIB01NZM156N} & 1973-12 -- 2026-09 \\
+JPY & \texttt{DEXJPUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01JPM156N} & 2002-04 -- 2026-08 \\
+CHF & \texttt{DEXSZUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01CHM156N} & 1999-07 -- 2026-09 \\
+CAD & \texttt{DEXCAUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01CAM156N} & 1956-01 -- 2026-09 \\
+NOK & \texttt{DEXNOUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01NOM156N} & 1979-01 -- 2026-09 \\
+SEK & \texttt{DEXSDUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01SEM156N} & 1982-01 -- 2026-09 \\
+\bottomrule
+\end{tabular}
+\caption{Data series (downloaded on 19 October 2026). Spot: Federal Reserve H.10, daily noon buying rates in New York. Rates: OECD Main Economic Indicators, 3-month interbank rates, monthly averages, \% per year.}
+\label{tab:data}
+\end{table}
+
+\paragraph{Quotation convention.}
+FRED quotes the euro, the pound and the Australian and New Zealand dollars in US dollars per unit of foreign currency, and the other currencies in foreign currency per US dollar.
+All spot rates are converted to US dollars per unit of foreign currency, so that an increase of $S_t$ is always an appreciation of the foreign currency, consistently with equation~\eqref{eq:rx-deposit}.
+
+\paragraph{Sample.}
+The common sample of spot and interest rates starts in April 2002 (Japanese rates) and ends in January 2026 (euro area and UK rates).
+\todo{decide between a balanced panel 2002--2026 and an unbalanced panel that uses each currency as soon as it is available.}
+
+\paragraph{Limitations.}
 \begin{itemize}
-  \item \textbf{Spot exchange rates}: daily noon buying rates in New York for the G10 currencies, Federal Reserve H.10 release, through FRED.
-  \item \textbf{Interest rates}: short-term interbank rates (3-month) from the OECD Main Economic Indicators, through FRED; euro short-term rate (\texttt{ESTR}) from the ECB.
-  \item \textbf{Forward rates}: not freely available; implied from spot and interest rates by CIP (equation~\ref{eq:rx-forward}). Limitation: post-2008 CIP deviations \citep{du2018}.
-  \item \textbf{Transaction costs}: bid--ask spreads taken from the literature for G10 currencies \todo{reference and figures}.
+  \item \textbf{Forward rates} are not freely available; they are implied by CIP (equation~\ref{eq:rx-forward}). Since 2008, CIP deviations of the order of a few tens of basis points per year exist \citep{du2018}.
+  \item \textbf{Interest rates} are monthly averages of interbank rates, not the rate observed on the day a position is opened.
+  \item \textbf{Transaction costs}: bid--ask spreads are not in the data and must be modelled \todo{reference and figures}.
 \end{itemize}
-
-Planned summary table: sample period, frequency, number of observations, missing values and their treatment for each series.

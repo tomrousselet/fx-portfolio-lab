@@ -33,6 +33,11 @@ Entries are never deleted: a decision that is reversed is superseded by a new en
 {(a) A word processor document. (b) Notebooks only.}
 {\LaTeX{} is the standard for scientific documents with equations. Keeping it in the repository ties each version of the text to the version of the code that produced its results.}
 
+\decision{D7}{19 October 2026}{Data downloaded by a script from the FRED CSV interface}
+{A script downloads each series from its public FRED address and caches the raw file in \texttt{data/raw/}; the files are read and cleaned by the \texttt{fxlab.data} module. Spot rates are converted to US dollars per unit of foreign currency.}
+{(a) Manual download from the website. (b) The FRED API, which requires a personal key. (c) A third-party package such as \texttt{pandas-datareader}.}
+{A script makes the dataset reproducible with one command and can refresh it at any time. The public CSV interface needs no key and only the Python standard library, so there is no dependency that could break. A single quotation convention avoids sign errors on half of the currencies.}
+
 \subsection*{Open decisions}
 \addcontentsline{toc}{subsection}{Open decisions}
 \begin{itemize}
