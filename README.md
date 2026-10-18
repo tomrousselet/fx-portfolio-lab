@@ -1,6 +1,6 @@
 # FX Portfolio Lab
 
-[![Tests](https://github.com/YOUR_GITHUB_USERNAME/fx-portfolio-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/fx-portfolio-lab/actions/workflows/tests.yml)
+[![Tests](https://github.com/tomrousselet/fx-portfolio-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/tomrousselet/fx-portfolio-lab/actions/workflows/tests.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -101,7 +101,7 @@ All data are public and downloaded by script, so anyone can reproduce the result
 ## Getting started
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/fx-portfolio-lab.git
+git clone https://github.com/tomrousselet/fx-portfolio-lab.git
 cd fx-portfolio-lab
 python3 -m venv .venv
 source .venv/bin/activate
@@ -150,6 +150,7 @@ Main references (full list in the paper): Markowitz (1952); DeMiguel, Garlappi a
 
 ## Author
 
-**Tom Rousselet** - EDHEC Business School
+**Tom Rousselet** - EDHEC Business School  
+[tom.rousselet@edhec.com](mailto:tom.rousselet@edhec.com) · [github.com/tomrousselet](https://github.com/tomrousselet)
 
 *This project is for educational and research purposes. It is not investment advice.*
