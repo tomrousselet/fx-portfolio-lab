@@ -63,6 +63,11 @@ Entries are never deleted: a decision that is reversed is superseded by a new en
 {(a) Running the tests locally only. (b) No licence, or a restrictive one.}
 {Tests run on a clean machine catch errors that a local environment hides (a missing dependency, a file that only exists locally), and the badge shows any reader that the suite passes. Without a licence, published code cannot legally be reused; MIT is the most common licence for demonstration projects and imposes only attribution.}
 
+\decision{D13}{19 October 2026}{Compiled paper versioned in the repository}
+{The compiled PDF is copied to \texttt{paper/fx-portfolio-lab.pdf} by \texttt{make} and committed with each update of the paper; LaTeX build files remain ignored.}
+{(a) PDF attached to GitHub releases only. (b) PDF compiled by the continuous integration. (c) Sources only.}
+{A reader who is not going to compile \LaTeX{} must be able to open the paper in one click from the README. Committing the PDF is the simplest way to guarantee it and keeps each version of the PDF next to the code that produced it. Compiling in the CI would require installing a TeX distribution on every run, which is slow for a document that changes only a few times per phase.}
+
 \subsection*{Open decisions}
 \addcontentsline{toc}{subsection}{Open decisions}
 \begin{itemize}

@@ -3,7 +3,8 @@
 Usage:
     python scripts/make_figures.py
 
-Writes paper/figures/cumulative_excess_returns.png.
+Writes paper/figures/cumulative_excess_returns.png (light theme, used in the paper)
+and cumulative_excess_returns_dark.png (shown on GitHub to readers in dark mode).
 """
 
 from pathlib import Path
@@ -18,23 +19,34 @@ from fxlab.fx_returns import monthly_dataset
 
 FIG_DIR = Path(__file__).resolve().parents[1] / "paper" / "figures"
 
-# Reference categorical palette, slots 1-4 in fixed order (light mode)
 SERIES = [
-    ("EW", "Equally weighted (dollar factor)", "#2a78d6"),
-    ("AUD", "AUD (high carry)", "#eb6834"),
-    ("JPY", "JPY (low carry)", "#1baf7a"),
-    ("CHF", "CHF (safe haven)", "#eda100"),
+    ("EW", "Equally weighted (dollar factor)"),
+    ("AUD", "AUD (high carry)"),
+    ("JPY", "JPY (low carry)"),
+    ("CHF", "CHF (safe haven)"),
 ]
-SURFACE, TEXT, MUTED, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
+# Reference categorical palette, slots 1-4 in fixed order, with its light and dark steps
+THEMES = {
+    "light": {
+        "colors": ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"],
+        "surface": "#fcfcfb", "text": "#0b0b0b", "muted": "#52514e", "grid": "#e4e3df",
+    },
+    "dark": {
+        "colors": ["#3987e5", "#d95926", "#199e70", "#c98500"],
+        "surface": "#0d1117", "text": "#ffffff", "muted": "#c3c2b7", "grid": "#30363d",
+    },
+}
 
 
-def cumulative_excess_returns(rx):
+def cumulative_excess_returns(rx, theme="light"):
+    t = THEMES[theme]
+    SURFACE, TEXT, MUTED, GRID = t["surface"], t["text"], t["muted"], t["grid"]
     rx = rx.assign(EW=rx.mean(axis=1))
     fig, ax = plt.subplots(figsize=(9, 4.8), dpi=200)
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
 
-    for code, label, color in SERIES:
+    for (code, label), color in zip(SERIES, t["colors"]):
         value = (1 + rx[code].dropna()).cumprod()
         ax.plot(value.index, value, color=color, lw=1.6, label=label)
         ax.annotate(
@@ -72,9 +84,11 @@ def cumulative_excess_returns(rx):
 def main():
     _, _, rx = monthly_dataset(load_spot(), load_rates())
     FIG_DIR.mkdir(parents=True, exist_ok=True)
-    path = FIG_DIR / "cumulative_excess_returns.png"
-    cumulative_excess_returns(rx).savefig(path, facecolor=SURFACE)
-    print(f"Figure written to {path.relative_to(FIG_DIR.parents[1])}")
+    for theme, suffix in [("light", ""), ("dark", "_dark")]:
+        path = FIG_DIR / f"cumulative_excess_returns{suffix}.png"
+        fig = cumulative_excess_returns(rx, theme)
+        fig.savefig(path, facecolor=fig.get_facecolor())
+        print(f"Figure written to {path.relative_to(FIG_DIR.parents[1])}")
 
 
 if __name__ == "__main__":

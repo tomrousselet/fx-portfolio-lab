@@ -19,7 +19,7 @@ Raw data are not versioned: `scripts/download_data.py` rebuilds them from public
 ## 2. Data flow
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph Sources["Public sources (FRED)"]
         H10["Federal Reserve H.10<br/>daily spot rates<br/>9 G10 currencies"]
         OECD["OECD MEI<br/>monthly 3-month rates<br/>10 currencies"]
@@ -38,12 +38,14 @@ flowchart LR
     subgraph Out["Outputs"]
         TAB["paper/tables/*.tex"]
         FIG["paper/figures/*.png"]
-        PDF["paper/build/main.pdf"]
+        PDF["paper/fx-portfolio-lab.pdf"]
     end
 
     H10 -->|download_data.py| CSV
     OECD -->|download_data.py| CSV
-    CSV --> DATA --> RX --> PF
+    CSV --> DATA
+    DATA --> RX
+    RX --> PF
     RX -->|describe_returns.py| TAB
     RX -->|make_figures.py| FIG
     TAB --> PDF

@@ -1,0 +1,3 @@
+# Keep GitHub language statistics on the code: the paper is documentation
+paper/** linguist-documentation
+*.tex linguist-documentation
