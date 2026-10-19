@@ -13,14 +13,9 @@ import pandas as pd
 
 from fxlab.data import load_rates, load_spot
 from fxlab.fx_returns import carry, monthly_dataset
+from fxlab.metrics import max_drawdown
 
 TABLE_PATH = Path(__file__).resolve().parents[1] / "paper" / "tables" / "excess_returns.tex"
-
-
-def max_drawdown(returns: pd.Series) -> float:
-    """max_t [1 - V_t / max_{s<=t} V_s] (course, section 2.2)."""
-    value = (1 + returns.dropna()).cumprod()
-    return float((1 - value / value.cummax()).max())
 
 
 def describe(rx: pd.DataFrame, carry_me: pd.DataFrame) -> pd.DataFrame:

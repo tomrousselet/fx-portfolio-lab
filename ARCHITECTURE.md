@@ -1,6 +1,6 @@
 # Architecture - FX Portfolio Lab
 
-**Version:** 0.1 (Phase 1) | **Language:** Python 3.11+ | **Documentation:** [working paper](paper/)
+**Version:** 0.2 (end of Phase 1) | **Language:** Python 3.11+ | **Documentation:** [working paper](paper/)
 
 ---
 
@@ -33,6 +33,8 @@ flowchart TB
         DATA["data.py<br/>download, parse,<br/>USD per foreign unit"]
         RX["fx_returns.py<br/>month-end sampling<br/>CIP forwards, carry<br/>excess returns"]
         PF["portfolio.py<br/>valuation, rebalancing<br/>amounts traded"]
+        FW["forwards.py + costs.py<br/>rolled forwards<br/>roll and outright costs"]
+        MT["metrics.py<br/>Sharpe, t-stat, skewness,<br/>drawdown, break-even"]
     end
 
     subgraph Out["Outputs"]
@@ -46,6 +48,9 @@ flowchart TB
     CSV --> DATA
     DATA --> RX
     RX --> PF
+    RX --> FW
+    FW --> MT
+    MT -->|backtest_benchmarks.py| TAB
     RX -->|describe_returns.py| TAB
     RX -->|make_figures.py| FIG
     TAB --> PDF
@@ -62,19 +67,22 @@ graph TB
         D["fxlab.data<br/>──────────<br/>SPOT_SERIES, RATE_SERIES<br/>download_series()<br/>load_spot(), load_rates()"]
         R["fxlab.fx_returns<br/>──────────<br/>month_end_spot(), month_end_rates()<br/>forward_rates(), carry()<br/>excess_returns(), monthly_dataset()"]
         P["fxlab.portfolio<br/>──────────<br/>simple_returns(), compound()<br/>backtest() -> BacktestResult"]
+        C["fxlab.costs<br/>──────────<br/>CostModel, BASE_CASE<br/>rebalancing_cost()"]
+        F["fxlab.forwards<br/>──────────<br/>backtest_forwards()<br/>equal_weights()"]
+        M["fxlab.metrics<br/>──────────<br/>summary(), sharpe_ratio()<br/>break_even_cost_scale()"]
     end
 
     subgraph Planned["Planned"]
-        C["costs<br/>bid-ask spreads"]
         S["signals<br/>carry, momentum, value"]
         O["optimisation<br/>GMV, mean-variance,<br/>risk parity, shrinkage"]
         H["hedging<br/>EUR investor"]
         X["options / structuring<br/>Garman-Kohlhagen, smile,<br/>Monte Carlo"]
     end
 
-    D --> R --> P
-    P --> C
-    R --> S --> O --> P
+    D --> R --> F
+    C --> F --> M
+    P -.->|same method| F
+    R --> S --> O --> F
     R --> H
     X
 ```
@@ -84,6 +92,9 @@ graph TB
 | `fxlab.data` | Download FRED series, parse missing values, convert every spot rate to USD per unit of foreign currency | Section 3, D5, D7 |
 | `fxlab.fx_returns` | Month-end sampling, CIP forward rates, carry, monthly excess returns with a strict timing rule | Section 4.2, D8-D11 |
 | `fxlab.portfolio` | Value buy-and-hold and rebalanced portfolios by propagating amounts; report the amount traded | Section 4.1, D4 |
+| `fxlab.forwards` | Value portfolios of rolled one-month forwards: notional weights, collateral, costs, turnover | Section 4.3 |
+| `fxlab.costs` | Swap half-spread on the notional rolled, outright half-spread on the notional traded; base case and scaling | Section 4.4, D14, D15 |
+| `fxlab.metrics` | Annualised mean and volatility, Sharpe, t-stat, skewness, kurtosis, drawdown, break-even cost scale | Section 4.5 |
 
 ---
 

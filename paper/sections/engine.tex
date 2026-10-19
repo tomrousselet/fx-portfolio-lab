@@ -1,6 +1,6 @@
 \section{Valuation and backtesting engine}\label{sec:engine}
 
-\subsection{Portfolio valuation}
+\subsection{Portfolio valuation}\label{sec:valuation}
 
 The engine values a portfolio by propagating the dollar amounts held in each constituent, following the general method of \citet{milhau2026}: amounts are updated with equation~\eqref{eq:amount-update} between rebalancing dates and reset by the allocation rule on rebalancing dates.
 Working with amounts rather than weights has two advantages.
@@ -32,4 +32,65 @@ The \emph{carry} of the position, known at $t$, is $S_t/F_t - 1 \approx (i_t^* -
 Equation~\eqref{eq:rx-monthly} uses only $S_t$, $i_t$ and $i^*_t$, observed at the end of month $t$, to open the position; the outcome $S_{t+1}$ is observed one month later.
 A test checks that changing the interest rates at $t+1$ or the spot rates after $t+1$ leaves $rx_{t+1}$ unchanged.
 
-\todo{Phase 1: forward positions in the backtester, transaction costs, performance and risk measures.}
+\subsection{Backtesting portfolios of forwards}\label{sec:fwd-backtest}
+
+The valuation of Section~\ref{sec:valuation} assumes a fully invested portfolio, whose weights sum to one.
+A currency strategy is different: a forward requires no capital, so the capital $V_t$ is held as collateral, and the strategy is described by \emph{notional weights} $w_{t,i} = N_{t,i}/V_t$, the notional of the forward on currency $i$ divided by the capital.
+These weights need not sum to one; a long-short strategy has $\sum_i w_{t,i} = 0$.
+
+The engine applies the amount-propagation method to notionals (Decision~D4).
+At the end of month $t$, the strategy decides target weights $w_t$ from information available at $t$, and the notionals are set to $N_{t,i} = w_{t,i} V_t$.
+Moving from the notionals of the previous month to $N_t$ costs $C_t$ (Section~\ref{sec:costs}), paid immediately.
+Over month $t+1$ the forwards earn $\sum_i N_{t,i}\, rx_{t+1,i}$ and the collateral may earn the US rate, so that
+\begin{equation}\label{eq:fwd-value}
+  V_{t+1} = V_t - C_t + \sum_{i=1}^N N_{t,i}\, rx_{t+1,i} + V_t\,\frac{i_t}{12},
+  \qquad
+  \frac{V_{t+1}}{V_t} - 1 = \w_t'\vect{rx}_{t+1} - \frac{C_t}{V_t} + \frac{i_t}{12}.
+\end{equation}
+The first term is the course's fundamental property $r_p = \w'\vect{r}$ applied to excess returns; the last term is omitted when excess returns are reported, which is the default in this paper.
+A position in a currency whose excess return is not available is rejected by the engine, so that a strategy cannot silently trade a currency that has left the panel.
+
+\subsection{Transaction costs}\label{sec:costs}
+
+\paragraph{Model (Decision D14).}
+A forward position kept from one month to the next is rolled with an FX swap, which simultaneously closes the maturing forward and opens a new one; a swap is cheaper than two outright trades.
+Any change of position is an outright trade.
+For each currency, with $N^{-}$ the previous notional and $N$ the new one, the cost is
+\begin{equation}\label{eq:cost}
+  C_i = c^{\mathrm{swap}}_i \times \underbrace{\min(|N^-|, |N|)\,\mathbb{1}\{N^- N > 0\}}_{\text{notional rolled}}
+      + c^{\mathrm{out}}_i \times \underbrace{|N - N^-|}_{\text{notional traded}},
+\end{equation}
+where $c^{\mathrm{swap}}_i$ and $c^{\mathrm{out}}_i$ are half-spreads in fraction of notional.
+A change of sign keeps nothing: the position is closed and reopened.
+A model that charged only the notional traded would ignore the roll and understate the cost of strategies that hold their positions, such as the carry trade.
+
+\paragraph{Level (Decision D15).}
+Bid--ask spreads are not freely available.
+The base case is therefore an \emph{assumption} by liquidity tier, not an estimate: outright and swap half-spreads of 2 and 1 basis points for the most liquid currencies (EUR, JPY, GBP, CHF, CAD), 3 and 1.5 for AUD and NZD, and 5 and 2.5 for NOK and SEK.
+Rather than depending on these figures, every strategy is reported for the base case scaled by 0, 1, 2 and 5, together with its \emph{break-even cost scale}: the multiple of the base case at which its average net return falls to zero.
+Readers can compare this multiple with their own trading costs, which differ widely between an interbank dealer and a corporate client.
+
+\subsection{Performance and risk measures}\label{sec:metrics}
+
+For monthly returns $r_t$ with sample mean $\bar r$ and standard deviation $s$ over $n$ months, the paper reports the annualised mean $12\bar r$, the annualised volatility $\sqrt{12}\,s$, the Sharpe ratio $\sqrt{12}\,\bar r/s$ (the returns being already in excess of the US rate), the $t$-statistic of the mean $\bar r/(s/\sqrt n)$, which equals the Sharpe ratio times the square root of the number of years, the skewness and excess kurtosis of monthly returns, the maximum drawdown, the annual cost $12\,\overline{C/V}$ and the annual turnover $12\,\overline{\sum_i|N_t - N^-_{t}|/V}$.
+Skewness is the key measure of crash risk: a strategy that earns small regular gains and suffers rare large losses has a negative skewness \citep{brunnermeier2008}.
+
+\subsection{First application: the dollar factor}\label{sec:dollar}
+
+The equally weighted portfolio of Table~\ref{tab:rx} is now backtested with the engine: at the end of each month it is long $1/N_t$ of each of the $N_t$ currencies available at that date, i.e.\ whose spot rate and interest rates are known.
+Table~\ref{tab:dollar-costs} reports the results for the four cost scenarios.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\input{tables/dollar_factor_costs}
+\caption{Equally weighted currency portfolio (dollar factor), February 1999 -- September 2026, monthly excess returns net of transaction costs. Costs are the base case of Section~\ref{sec:costs} multiplied by 0, 1, 2 and 5. Generated by \texttt{scripts/backtest\_benchmarks.py}.}
+\label{tab:dollar-costs}
+\end{table}
+
+Three points are worth noting.
+First, with zero costs the engine reproduces the mean of the cross-sectional average of Table~\ref{tab:rx} (0.35\% a year), an independent check of the backtest.
+Second, even a strategy that almost never trades pays about 0.18\% a year in the base case, because its whole notional is rolled every month; the outright turnover is only 0.36 times the capital a year, coming from the monthly resizing of positions and from currencies entering or leaving the panel.
+This confirms that ignoring the roll (alternative of Decision~D14) would understate costs.
+Third, the break-even cost scale is \input{tables/dollar_factor_breakeven}\unskip~times the base case: with costs about twice the base case, the small premium of the dollar factor disappears.
+The dollar factor is not a strategy in itself but the benchmark against which the long-short strategies of Section~\ref{sec:portfolios} are compared; since those are long and short at the same time, they do not earn this premium and must be justified by their own returns.

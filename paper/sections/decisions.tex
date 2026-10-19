@@ -68,9 +68,18 @@ Entries are never deleted: a decision that is reversed is superseded by a new en
 {(a) PDF attached to GitHub releases only. (b) PDF compiled by the continuous integration. (c) Sources only.}
 {A reader who is not going to compile \LaTeX{} must be able to open the paper in one click from the README. Committing the PDF is the simplest way to guarantee it and keeps each version of the PDF next to the code that produced it. Compiling in the CI would require installing a TeX distribution on every run, which is slow for a document that changes only a few times per phase.}
 
+\decision{D14}{19 October 2026}{Transaction costs: roll plus change of position}
+{The notional kept from one month to the next pays the swap half-spread (roll); the notional traded pays the outright half-spread (equation~\ref{eq:cost}).}
+{A single half-spread on the notional traded only.}
+{Holding a forward position requires rolling it every month with an FX swap, which is how an FX desk maintains the exposure. Ignoring the roll would understate the cost of strategies that hold their positions; on the dollar factor, the roll accounts for most of the cost (Section~\ref{sec:dollar}).}
+
+\decision{D15}{19 October 2026}{Cost level: stated assumption, sensitivity and break-even}
+{The base-case half-spreads are an explicit assumption by liquidity tier (Section~\ref{sec:costs}); results are reported for the base case scaled by 0, 1, 2 and 5, with the break-even cost scale of each strategy.}
+{(a) Figures presented as estimates without a public data source. (b) A single cost for all currencies.}
+{Bid--ask quotes are not freely available, so any single figure would be an assumption; presenting it as an estimate would overstate its precision. The break-even scale answers the question that matters (up to which cost does a strategy remain profitable?) without depending on the assumption, and the tiers keep the ranking of liquidity between currencies.}
+
 \subsection*{Open decisions}
 \addcontentsline{toc}{subsection}{Open decisions}
 \begin{itemize}
-  \item Transaction cost model (bid--ask spreads on spot and forwards).
   \item Extension of the euro and sterling interest rates after January 2026 (ECB and Bank of England series).
 \end{itemize}
