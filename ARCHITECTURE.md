@@ -1,6 +1,6 @@
 # Architecture - FX Portfolio Lab
 
-**Version:** 0.2 (end of Phase 1) | **Language:** Python 3.11+ | **Documentation:** [working paper](paper/)
+**Version:** 0.3 (Phase 1 and euro rates) | **Language:** Python 3.11+ | **Documentation:** [working paper](paper/)
 
 ---
 
@@ -20,9 +20,10 @@ Raw data are not versioned: `scripts/download_data.py` rebuilds them from public
 
 ```mermaid
 flowchart TB
-    subgraph Sources["Public sources (FRED)"]
+    subgraph Sources["Public sources (FRED, ECB Data Portal)"]
         H10["Federal Reserve H.10<br/>daily spot rates<br/>9 G10 currencies"]
-        OECD["OECD MEI<br/>monthly 3-month rates<br/>10 currencies"]
+        OECD["OECD MEI<br/>3-month rates, 10-year yields"]
+        ECB["ECB and FRED<br/>Euribor, ESTR, SOFR, SONIA"]
     end
 
     subgraph Raw["data/raw/ (not versioned)"]
@@ -35,6 +36,7 @@ flowchart TB
         PF["portfolio.py<br/>valuation, rebalancing<br/>amounts traded"]
         FW["forwards.py + costs.py<br/>rolled forwards<br/>roll and outright costs"]
         MT["metrics.py<br/>Sharpe, t-stat, skewness,<br/>drawdown, break-even"]
+        EU["euro.py + regression.py<br/>rates and risk channels<br/>Newey-West OLS"]
     end
 
     subgraph Out["Outputs"]
@@ -45,12 +47,16 @@ flowchart TB
 
     H10 -->|download_data.py| CSV
     OECD -->|download_data.py| CSV
+    ECB -->|download_data.py| CSV
     CSV --> DATA
     DATA --> RX
     RX --> PF
     RX --> FW
     FW --> MT
     MT -->|backtest_benchmarks.py| TAB
+    DATA --> EU
+    EU -->|euro_drivers.py| TAB
+    EU -->|euro_drivers.py| FIG
     RX -->|describe_returns.py| TAB
     RX -->|make_figures.py| FIG
     TAB --> PDF
@@ -70,6 +76,8 @@ graph TB
         C["fxlab.costs<br/>──────────<br/>CostModel, BASE_CASE<br/>rebalancing_cost()"]
         F["fxlab.forwards<br/>──────────<br/>backtest_forwards()<br/>equal_weights()"]
         M["fxlab.metrics<br/>──────────<br/>summary(), sharpe_ratio()<br/>break_even_cost_scale()"]
+        G["fxlab.regression<br/>──────────<br/>ols() -> OLSResult<br/>rolling_coef()"]
+        E["fxlab.euro<br/>──────────<br/>euro_drivers()"]
     end
 
     subgraph Planned["Planned"]
@@ -82,6 +90,7 @@ graph TB
     D --> R --> F
     C --> F --> M
     P -.->|same method| F
+    D --> E --> G
     R --> S --> O --> F
     R --> H
     X
@@ -89,12 +98,14 @@ graph TB
 
 | Module | Responsibility | Paper |
 |---|---|---|
-| `fxlab.data` | Download FRED series, parse missing values, convert every spot rate to USD per unit of foreign currency | Section 3, D5, D7 |
+| `fxlab.data` | Download FRED and ECB series, parse missing values, convert every spot rate to USD per unit of foreign currency, extend rates by splicing | Section 3, D5, D7, D16, D17 |
 | `fxlab.fx_returns` | Month-end sampling, CIP forward rates, carry, monthly excess returns with a strict timing rule | Section 4.2, D8-D11 |
 | `fxlab.portfolio` | Value buy-and-hold and rebalanced portfolios by propagating amounts; report the amount traded | Section 4.1, D4 |
 | `fxlab.forwards` | Value portfolios of rolled one-month forwards: notional weights, collateral, costs, turnover | Section 4.3 |
 | `fxlab.costs` | Swap half-spread on the notional rolled, outright half-spread on the notional traded; base case and scaling | Section 4.4, D14, D15 |
 | `fxlab.metrics` | Annualised mean and volatility, Sharpe, t-stat, skewness, kurtosis, drawdown, break-even cost scale | Section 4.5 |
+| `fxlab.regression` | OLS with Newey-West standard errors, rolling coefficients | Section 6, D18 |
+| `fxlab.euro` | Monthly changes of EURUSD and EURCHF and of rate differentials and sovereign spreads | Section 6, D18 |
 
 ---
 

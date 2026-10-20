@@ -78,8 +78,26 @@ Entries are never deleted: a decision that is reversed is superseded by a new en
 {(a) Figures presented as estimates without a public data source. (b) A single cost for all currencies.}
 {Bid--ask quotes are not freely available, so any single figure would be an assumption; presenting it as an estimate would overstate its precision. The break-even scale answers the question that matters (up to which cost does a strategy remain profitable?) without depending on the assumption, and the tiers keep the ranking of liquidity between currencies.}
 
+\decision{D16}{20 October 2026}{Interbank rates in covered interest parity, with a risk-free-rate robustness check}
+{Forwards are implied from 3-month interbank rates over the whole sample; from November 2019, euro and sterling excess returns are recomputed with the overnight risk-free rates (SOFR, ESTR, SONIA) as a robustness check (Section~\ref{sec:rates-choice}).}
+{(a) Risk-free rates only: they do not exist before 2018--2019 and not for every currency in free data. (b) Interbank rates without discussion.}
+{Interbank rates contain a bank credit premium and a term component that the rates of a collateralised FX swap do not contain, a point raised by practitioners. But they were the market reference before the benchmark reform, they cover the whole sample and all currencies, and the robustness check shows that switching to risk-free rates changes monthly excess returns by about 1 basis point. The choice is therefore kept and its limits are stated.}
+
+\decision{D17}{20 October 2026}{Extension of the euro and sterling rates after January 2026}
+{The euro rate is continued with the 3-month Euribor published by the ECB; the sterling rate with the monthly average of SONIA, shifted by the mean gap over the last twelve months of overlap.}
+{(a) Let the two currencies leave the panel in February 2026. (b) Splice SONIA without a shift.}
+{The OECD euro series is the Euribor, so the ECB series continues it exactly. For sterling no 3-month interbank rate exists after LIBOR; a constant shift removes the jump at the junction ($-0.08$ point) without changing the monthly variation of the rate. Keeping the euro and sterling in the panel avoids changing the investment universe at the end of the sample.}
+
+\decision{D18}{20 October 2026}{Euro drivers measured with monthly averages and Newey--West standard errors}
+{The regressions of Section~\ref{sec:euro} use changes of monthly averages for the exchange rates as well as for rates and yields, and Newey--West standard errors with the usual lag rule.}
+{(a) Month-end exchange rates against monthly-average yields. (b) Classical OLS standard errors.}
+{The OECD rates and yields are only available as monthly averages; mixing them with month-end exchange rates would misalign the timing of the two sides. Averaging induces autocorrelation in monthly changes, and financial data are heteroskedastic, so classical standard errors would overstate precision; Newey--West standard errors are robust to both.}
+
+\decision{D19}{20 October 2026}{Scope: what is not added from the practitioner advice}
+{ECB meeting pricing, sovereign debt auctions and the carry and roll-down of bonds are not part of the project; they are followed as market monitoring outside it.}
+{(a) An event study of ECB meeting days. (b) A rates module for bond carry, roll-down and repo.}
+{Measuring a monetary policy surprise requires the market pricing of each meeting (dated overnight-index swaps), which is not freely available historically, and a complete list of meeting dates that would have to be compiled by hand; auctions have no free historical database. Bond carry and roll-down belong to a rates desk: adding them would blur a project whose subject is currencies. The euro is studied instead through the two channels of Section~\ref{sec:euro}, which public data can measure.}
+
 \subsection*{Open decisions}
 \addcontentsline{toc}{subsection}{Open decisions}
-\begin{itemize}
-  \item Extension of the euro and sterling interest rates after January 2026 (ECB and Bank of England series).
-\end{itemize}
+None at this stage. The decisions of Phase 2 (signal construction, portfolio formation, estimation of the covariance matrix) will be added before the corresponding code is written.

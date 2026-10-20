@@ -1,4 +1,4 @@
-"""Download every FRED series used by the project into data/raw/.
+"""Download every series used by the project (FRED and ECB) into data/raw/.
 
 Usage:
     python scripts/download_data.py            # download missing files only
@@ -7,7 +7,7 @@ Usage:
 
 import argparse
 
-from fxlab.data import all_series_ids, download_series, load_rates, load_spot
+from fxlab.data import all_sources, download_source, load_rates, load_spot
 
 
 def main():
@@ -15,9 +15,9 @@ def main():
     parser.add_argument("--refresh", action="store_true", help="re-download files already present")
     args = parser.parse_args()
 
-    for sid in all_series_ids():
-        path = download_series(sid, refresh=args.refresh)
-        print(f"  {sid:<18} -> {path.name}")
+    for source in all_sources():
+        path = download_source(source, refresh=args.refresh)
+        print(f"  {source[0].upper():<5} {path.name}")
 
     spot, rates = load_spot(), load_rates()
     print("\nSpot rates (USD per unit of foreign currency), last valid value:")

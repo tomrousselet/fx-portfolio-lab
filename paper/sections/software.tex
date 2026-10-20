@@ -8,11 +8,13 @@
 Module & Content \\
 \midrule
 \texttt{fxlab.portfolio} & Returns, compounding, valuation of buy-and-hold and rebalanced portfolios \\
-\texttt{fxlab.data} & Download and loading of FRED series, quotation convention \\
+\texttt{fxlab.data} & Download and loading of FRED and ECB series, quotation convention, splicing \\
 \texttt{fxlab.fx\_returns} & Month-end sampling, CIP forwards, excess returns, carry \\
 \texttt{fxlab.costs} & Cost model: roll and outright half-spreads, base case and scaling \\
 \texttt{fxlab.forwards} & Backtest of portfolios of rolled forwards, equal weights \\
 \texttt{fxlab.metrics} & Performance and risk measures, break-even cost scale \\
+\texttt{fxlab.regression} & OLS with Newey--West standard errors, rolling coefficients \\
+\texttt{fxlab.euro} & Monthly changes of the euro and of its rates and risk drivers \\
 \bottomrule
 \end{tabular}
 \caption{Modules of the \texttt{fxlab} package.}
@@ -52,6 +54,9 @@ Test & Source & Result checked \\
 \texttt{test\_no\_look\_ahead} (forwards) & Timing rule & weights at $t$ only affect month $t+1$ \\
 \texttt{test\_position\_without\_\ldots} & Section~\ref{sec:fwd-backtest} & position without a return rejected \\
 \texttt{test\_metrics.py} (7 tests) & Section~\ref{sec:metrics} & mean, vol, Sharpe, $t$-stat, drawdown, skewness by hand \\
+\midrule
+\texttt{test\_data.py}, new tests (5) & Section~\ref{sec:rates-choice} & ECB file format, monthly averages, splice without jump, overlap required \\
+\texttt{test\_regression.py} (8 tests) & Section~\ref{sec:euro} & coefficients recovered, White formula, HAC wider under autocorrelation, lag rule, rolling, drivers by hand \\
 \bottomrule
 \end{tabular}
 \caption{Verification tests.}

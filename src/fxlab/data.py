@@ -1,6 +1,8 @@
-"""Download and load FX spot rates and short-term interest rates from FRED.
+"""Download and load FX spot rates, interest rates and bond yields.
 
-FRED serves every series as a CSV file at a public URL, without an API key.
+Two public sources, both serving CSV files at a public URL without an API key:
+FRED (Federal Reserve Bank of St. Louis) and the ECB Data Portal. A series is
+identified by a *source*: ("fred", series_id) or ("ecb", flow, key).
 Raw files are cached in data/raw/ (not versioned): only this code is versioned,
 so anyone can rebuild exactly the same dataset.
 """
@@ -11,6 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={}"
+ECB_URL = "https://data-api.ecb.europa.eu/service/data/{flow}/{key}?format=csvdata"
 RAW_DIR = Path(__file__).resolve().parents[2] / "data" / "raw"
 
 # Spot rates (Federal Reserve H.10, daily noon buying rates in New York).
@@ -44,18 +47,63 @@ RATE_SERIES = {
 }
 
 
-def all_series_ids() -> list[str]:
-    return [sid for sid, _ in SPOT_SERIES.values()] + list(RATE_SERIES.values())
+# Extensions of the OECD rates that stop in January 2026 (decision D17).
+# EUR: the OECD series is the 3-month Euribor, published to date by the ECB.
+# GBP: no 3-month interbank rate after LIBOR; extended with the monthly average of SONIA.
+RATE_EXTENSIONS = {
+    "EUR": ("ecb", "FM", "M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA"),
+    "GBP": ("fred", "IUDSOIA"),
+}
+
+# Secured or overnight risk-free reference rates, daily (robustness check, decision D16).
+RFR_SERIES = {
+    "USD": ("fred", "SOFR"),
+    "EUR": ("ecb", "EST", "B.EU000A2X2A25.WT"),
+    "GBP": ("fred", "IUDSOIA"),
+}
+
+# 10-year government bond yields (OECD MEI), monthly averages, % per year (euro drivers, section 5).
+YIELD_SERIES = {
+    "US": ("fred", "IRLTLT01USM156N"),
+    "DE": ("fred", "IRLTLT01DEM156N"),
+    "IT": ("fred", "IRLTLT01ITM156N"),
+    "FR": ("fred", "IRLTLT01FRM156N"),
+    "ES": ("fred", "IRLTLT01ESM156N"),
+    "CH": ("fred", "IRLTLT01CHM156N"),
+}
+
+
+def all_sources() -> list[tuple]:
+    sources = [("fred", sid) for sid, _ in SPOT_SERIES.values()]
+    sources += [("fred", sid) for sid in RATE_SERIES.values()]
+    sources += list(RATE_EXTENSIONS.values()) + list(RFR_SERIES.values()) + list(YIELD_SERIES.values())
+    return list(dict.fromkeys(sources))  # unique, in order
+
+
+def source_path(source: tuple, raw_dir: Path = RAW_DIR) -> Path:
+    if source[0] == "fred":
+        return raw_dir / f"{source[1]}.csv"
+    _, flow, key = source
+    return raw_dir / f"ECB_{flow}_{key}.csv"
+
+
+def download_source(source: tuple, raw_dir: Path = RAW_DIR, refresh: bool = False) -> Path:
+    """Save the CSV of `source` in raw_dir; skip it if already there."""
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    path = source_path(source, raw_dir)
+    if source[0] == "fred":
+        url = FRED_URL.format(source[1])
+    else:
+        url = ECB_URL.format(flow=source[1], key=source[2])
+    if refresh or not path.exists():
+        with urllib.request.urlopen(url, timeout=60) as response:
+            path.write_bytes(response.read())
+    return path
 
 
 def download_series(series_id: str, raw_dir: Path = RAW_DIR, refresh: bool = False) -> Path:
-    """Save the FRED CSV of `series_id` in raw_dir; skip it if already there."""
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    path = raw_dir / f"{series_id}.csv"
-    if refresh or not path.exists():
-        with urllib.request.urlopen(FRED_URL.format(series_id), timeout=60) as response:
-            path.write_bytes(response.read())
-    return path
+    """Save the FRED CSV of `series_id` in raw_dir (shortcut for a FRED source)."""
+    return download_source(("fred", series_id), raw_dir, refresh)
 
 
 def read_fred_csv(path: Path) -> pd.Series:
@@ -64,6 +112,39 @@ def read_fred_csv(path: Path) -> pd.Series:
     series = pd.to_numeric(df.iloc[:, 0], errors="coerce")
     series.index.name = "date"
     return series
+
+
+def read_ecb_csv(path: Path) -> pd.Series:
+    """Read an ECB Data Portal CSV (columns TIME_PERIOD and OBS_VALUE); monthly periods are dated on the 1st."""
+    df = pd.read_csv(path, usecols=["TIME_PERIOD", "OBS_VALUE"])
+    series = pd.Series(pd.to_numeric(df["OBS_VALUE"], errors="coerce").to_numpy(),
+                       index=pd.to_datetime(df["TIME_PERIOD"]), name=path.stem)
+    series.index.name = "date"
+    return series.sort_index()
+
+
+def read_source(source: tuple, raw_dir: Path = RAW_DIR) -> pd.Series:
+    path = source_path(source, raw_dir)
+    return read_fred_csv(path) if source[0] == "fred" else read_ecb_csv(path)
+
+
+def monthly_average(series: pd.Series) -> pd.Series:
+    """Average of the observations of each month, dated on the 1st (the FRED convention for monthly data)."""
+    return series.dropna().resample("MS").mean()
+
+
+def splice(base: pd.Series, extension: pd.Series, overlap: int = 12) -> pd.Series:
+    """Extend `base` after its last observation with `extension`, shifted by a constant.
+
+    The shift is the mean of base - extension over the last `overlap` months where both exist,
+    so that the spliced series has no jump at the junction (decision D17).
+    """
+    base = base.dropna()
+    common = (base - extension).dropna().iloc[-overlap:]
+    if common.empty:
+        raise ValueError("no overlap between the base series and its extension")
+    shifted = extension.dropna() + common.mean()
+    return pd.concat([base, shifted[shifted.index > base.index[-1]]])
 
 
 def load_spot(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
@@ -75,7 +156,24 @@ def load_spot(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
     return pd.DataFrame(columns)
 
 
-def load_rates(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
-    """Monthly 3-month interest rates in decimal per year (0.05 = 5%), one column per currency."""
-    columns = {ccy: read_fred_csv(raw_dir / f"{sid}.csv") / 100 for ccy, sid in RATE_SERIES.items()}
-    return pd.DataFrame(columns)
+def load_rates(raw_dir: Path = RAW_DIR, extend: bool = True) -> pd.DataFrame:
+    """Monthly 3-month interest rates in decimal per year (0.05 = 5%), one column per currency.
+
+    With extend=True, the EUR and GBP rates are extended after January 2026 (RATE_EXTENSIONS).
+    """
+    columns = {ccy: read_fred_csv(raw_dir / f"{sid}.csv") for ccy, sid in RATE_SERIES.items()}
+    if extend:
+        for ccy, source in RATE_EXTENSIONS.items():
+            columns[ccy] = splice(columns[ccy], monthly_average(read_source(source, raw_dir)))
+    return pd.DataFrame(columns) / 100
+
+
+def load_rfr_rates(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
+    """Monthly averages of the overnight risk-free rates (SOFR, ESTR, SONIA), decimal per year."""
+    columns = {ccy: monthly_average(read_source(src, raw_dir)) for ccy, src in RFR_SERIES.items()}
+    return pd.DataFrame(columns) / 100
+
+
+def load_yields(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
+    """Monthly 10-year government bond yields, decimal per year, one column per country."""
+    return pd.DataFrame({c: read_source(src, raw_dir) for c, src in YIELD_SERIES.items()}) / 100

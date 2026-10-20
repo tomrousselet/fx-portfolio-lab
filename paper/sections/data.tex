@@ -1,6 +1,6 @@
 \section{Data}\label{sec:data}
 
-All series are downloaded from FRED, the database of the Federal Reserve Bank of St.~Louis, by the script \texttt{scripts/download\_data.py} (Decision~D7).
+All series are downloaded from two public sources, FRED (the database of the Federal Reserve Bank of St.~Louis) and the ECB Data Portal, by the script \texttt{scripts/download\_data.py} (Decision~D7).
 Table~\ref{tab:data} lists them.
 
 \begin{table}[h]
@@ -11,8 +11,8 @@ Table~\ref{tab:data} lists them.
 Currency & Spot series & Spot available & Rate series & Rate available \\
 \midrule
 USD & -- & -- & \texttt{IR3TIB01USM156N} & 1964-06 -- 2026-09 \\
-EUR & \texttt{DEXUSEU} & 1999-01 -- 2026-10 & \texttt{IR3TIB01EZM156N} & 1994-01 -- 2026-01 \\
-GBP & \texttt{DEXUSUK} & 1971-01 -- 2026-10 & \texttt{IR3TIB01GBM156N} & 1957-01 -- 2026-01 \\
+EUR & \texttt{DEXUSEU} & 1999-01 -- 2026-10 & \texttt{IR3TIB01EZM156N}$^a$ & 1994-01 -- 2026-09 \\
+GBP & \texttt{DEXUSUK} & 1971-01 -- 2026-10 & \texttt{IR3TIB01GBM156N}$^b$ & 1957-01 -- 2026-10 \\
 AUD & \texttt{DEXUSAL} & 1971-01 -- 2026-10 & \texttt{IR3TIB01AUM156N} & 1968-01 -- 2026-08 \\
 NZD & \texttt{DEXUSNZ} & 1971-01 -- 2026-10 & \texttt{IR3TIB01NZM156N} & 1973-12 -- 2026-09 \\
 JPY & \texttt{DEXJPUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01JPM156N} & 2002-04 -- 2026-08 \\
@@ -22,7 +22,7 @@ NOK & \texttt{DEXNOUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01NOM156N} & 1979-01
 SEK & \texttt{DEXSDUS} & 1971-01 -- 2026-10 & \texttt{IR3TIB01SEM156N} & 1982-01 -- 2026-09 \\
 \bottomrule
 \end{tabular}
-\caption{Data series (downloaded on 19 October 2026). Spot: Federal Reserve H.10, daily noon buying rates in New York. Rates: OECD Main Economic Indicators, 3-month interbank rates, monthly averages, \% per year.}
+\caption{Data series (downloaded on 20 October 2026). Spot: Federal Reserve H.10, daily noon buying rates in New York. Rates: OECD Main Economic Indicators, 3-month interbank rates, monthly averages, \% per year. $^a$Extended after January 2026 with the 3-month Euribor of the ECB (\texttt{FM.M.U2.EUR.RT.MM.EURIBOR3MD\_.HSTA}). $^b$Extended after January 2026 with the monthly average of SONIA (\texttt{IUDSOIA}), see Section~\ref{sec:rates-choice}.}
 \label{tab:data}
 \end{table}
 
@@ -33,8 +33,8 @@ All spot rates are converted to US dollars per unit of foreign currency, so that
 \paragraph{Sample.}
 The sample starts in January 1999, with the introduction of the euro.
 A currency enters the panel as soon as its spot rate and interest rate are both available (Decision~D9): the Swiss franc in August 1999 and the yen in May 2002, all other currencies in February 1999.
-The euro and sterling rates published by the OECD stop in January 2026, so these two currencies leave the panel after February 2026.
-A balanced panel (May 2002 -- February 2026) is kept as a robustness check.
+The euro and sterling rates published by the OECD stop in January 2026; they are extended to date (Section~\ref{sec:rates-choice}), so that all nine currencies remain in the panel until September 2026.
+A balanced panel (May 2002 -- September 2026) is kept as a robustness check.
 
 \subsection{Descriptive statistics}
 
@@ -64,11 +64,38 @@ Three facts emerge from Table~\ref{tab:rx} and Figure~\ref{fig:cumrx}.
   \item \textbf{Average returns are imprecise.} The $t$-statistic of a mean return is approximately the annualised Sharpe ratio times the square root of the number of years. With Sharpe ratios below 0.25 and about 27 years of data, no individual mean is significantly different from zero at the 5\% level ($0.22\times\sqrt{27.5}\approx 1.15 < 1.96$). Expected returns are therefore much harder to estimate than volatilities, which is the practical argument for the minimum-variance portfolio \citep{milhau2026}.
 \end{enumerate}
 
+\subsection{Which interest rates in covered interest parity?}\label{sec:rates-choice}
+
+\paragraph{Interbank versus risk-free rates (Decision D16).}
+The rates of the OECD are 3-month \emph{interbank} rates: the rate at which a bank lends to another bank without collateral.
+They contain two components that the rate implicit in an FX forward does not necessarily contain.
+The first is a bank credit premium, since the loan is unsecured.
+The second is a term component: a 3-month rate reflects the policy rate expected over the next three months, so it rises above the overnight rate when the market expects hikes and falls below it when it expects cuts.
+The comparison of the sterling interbank rate with the overnight rate SONIA shows both: the gap was about $+0.1$ percentage point a year before 2021, rose to $+0.6$ in 2022 during the hiking cycle, and turned negative in 2024--2025 when cuts were expected.
+Since the reform of benchmark rates, FX forwards are priced off secured or overnight risk-free rates (SOFR, \texttt{ESTR}, SONIA), and an FX swap is itself a collateralised loan, of the same family as a repo.
+Before 2018--2019 these rates did not exist and the market priced forwards off interbank deposit rates, so the interbank rates are the consistent choice over most of the sample.
+
+\paragraph{Robustness.}
+Table~\ref{tab:rfr} recomputes the euro and sterling excess returns from November 2019 with the monthly averages of the overnight risk-free rates instead of the interbank rates.
+The average carry changes by at most 0.03 percentage point a year, the monthly excess returns differ by about 1 basis point on average, and their correlation is above 0.9999.
+The choice of rate is therefore immaterial for the results of this paper; it would matter for the pricing of an individual forward, where 1 basis point a month is the order of magnitude of a bid--ask spread.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\input{tables/rfr_robustness}
+\caption{Excess returns against the US dollar with 3-month interbank rates (baseline) and with monthly averages of the overnight risk-free rates (SOFR for USD, \texttt{ESTR} for EUR, SONIA for GBP), November 2019 -- January 2026. Generated by \texttt{scripts/robustness\_rfr.py}.}
+\label{tab:rfr}
+\end{table}
+
+\paragraph{Extension after January 2026 (Decision D17).}
+The OECD series for the euro is the 3-month Euribor: it coincides with the ECB series to within $0.0001$ percentage point on average over 1994--2026, so the ECB series simply continues it.
+For sterling, no 3-month interbank rate exists after the end of LIBOR; the series is continued with the monthly average of SONIA, shifted by the average gap between the two series over the last twelve months of overlap ($-0.08$ percentage point), so that the spliced series has no jump.
+
 \subsection{Limitations}
 \begin{itemize}
   \item \textbf{Forward rates} are not freely available; they are implied by CIP (equation~\ref{eq:rx-forward}). Since 2008, CIP deviations of the order of a few tens of basis points per year exist \citep{du2018}.
-  \item \textbf{Interest rates} are monthly averages of interbank rates, not the rate observed on the day a position is opened.
+  \item \textbf{Interest rates} are monthly averages of interbank rates, not the rate observed on the day a position is opened; the choice of interbank rather than risk-free rates is discussed in Section~\ref{sec:rates-choice}.
   \item \textbf{Maturity mismatch}: 3-month rates are used to price 1-month forwards, because 1-month rates are not freely available for all currencies. The error on the carry is of the order of the slope of the money-market curve between 1 and 3 months.
-  \item \textbf{Euro and sterling rates} stop in January 2026 in the OECD data; they could be extended with the ECB and Bank of England series.
-  \item \textbf{Transaction costs}: bid--ask spreads are not in the data and must be modelled \todo{reference and figures}.
+  \item \textbf{Transaction costs}: bid--ask spreads are not in the data; they are modelled as a stated assumption with a sensitivity analysis (Section~\ref{sec:costs}).
 \end{itemize}
